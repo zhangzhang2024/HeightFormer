@@ -1,0 +1,39 @@
+Metadata-Version: 2.1
+Name: pypcd
+Version: 0.1.1
+Summary: Pure Python PCD reader/writer
+Home-page: http://github.com/dimatura/pypcd
+Download-URL: 
+Author: Daniel Maturana
+Author-email: dimatura@cmu.edu
+Maintainer: Daniel Maturana
+Maintainer-email: dimatura@cmu.edu
+License: MIT
+Platform: OS Independent
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering
+License-File: LICENSE
+
+pypcd
+========
+
+Pure Python reader/writer for the PCL ``pcd`` data format for point clouds.
+
+Please go to the repository README_.
+
+.. _README: https://github.com/dimatura/pypcd/blob/master/README.md
+
+License
+=======
+``pypcd`` is licensed under the terms of the MIT license. See the file
+"LICENSE" for information on the history of this software, terms & conditions
+for usage, and a DISCLAIMER OF ALL WARRANTIES.
+
+All trademarks referenced herein are property of their respective holders.
+
+Copyright (c) 2015--, Daniel Maturana
