@@ -5,7 +5,7 @@
   </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Paper](https://img.shields.io/badge/Paper-TITS-3015c.svg)](https://ieeexplore.ieee.org/document/11005676)
+[![Paper](https://img.shields.io/badge/Paper-TITS-00629b.svg)](https://ieeexplore.ieee.org/document/11005676)
 
 <p align="center">
 <img src="docs/assets/height3d_fig3.png" width="800" alt="" class="img-responsive">
