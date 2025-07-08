@@ -23,9 +23,9 @@ Train Height3D with 8 GPUs
 ```
 python [EXP_PATH] --amp_backend native -b 8 --gpus 8
 ```
-Eval Height3D with 8 GPUs
+Eval Height3D with 1 GPU
 ```
-python [EXP_PATH] --ckpt_path [CKPT_PATH] -e -b 8 --gpus 8
+python [EXP_PATH] --ckpt_path [CKPT_PATH] -e -b 1 --gpus 1
 ```
 
 # Acknowledgment
