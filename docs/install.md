@@ -16,7 +16,7 @@ python setup.py install
 ```shell
 pip install -r requirements.txt
 ```
-**e.** Install Height3D (gpu required).
+**e.** Install HeightFormer (gpu required).
 ```shell
 python setup.py develop
 ```

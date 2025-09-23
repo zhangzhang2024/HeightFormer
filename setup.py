@@ -43,11 +43,11 @@ def make_cuda_ext(name,
 
 
 setup(
-    name='Height3D',
+    name='HeightFormer',
     version='0.0.1',
     author='Zhang Zhang',
     author_email='zhangzhang00@bit.edu.cn',
-    description='Code for Height3D',
+    description='Code for HeightFormer',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url=None,

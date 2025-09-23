@@ -21,7 +21,7 @@ python scripts/data_converter/visual_tools.py --data_root data/rope3d-kitti --de
 
 The directory will be as follows.
 ```
-BEVHeight
+HeightFormer
 ├── data
 │   ├── dair-v2x-i
 │   │   ├── velodyne

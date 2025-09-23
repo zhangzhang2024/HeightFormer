@@ -15,7 +15,7 @@ from torch.optim.lr_scheduler import MultiStepLR, CosineAnnealingLR
 
 from dataset.nusc_mv_det_dataset import NuscMVDetDataset, collate_fn
 from evaluators.det_evaluators import RoadSideEvaluator
-from models.height_3d import Height3D
+from models.height_3d import HeightFormer
 from utils.torch_dist import all_gather_object, get_rank, synchronize
 from utils.backup_files import backup_codebase
 
@@ -26,13 +26,13 @@ img_conf = dict(img_mean=[123.675, 116.28, 103.53],
                 img_std=[58.395, 57.12, 57.375],
                 to_rgb=True)
 
-data_root = "./data/dair-v2x-i"
-gt_label_path = "./data/DAIR-V2X/DAIR-V2X-I/dair-v2x-i-kitti/training/label_2"
+data_root = "./data/rope3d"
+gt_label_path = "./data/rope3d-kitti/training/label_2"
 
 backbone_conf = {
     'x_bound': [0, 102.4, 0.4],
     'y_bound': [-51.2, 51.2, 0.4],
-    'z_bound': [-2.0, 0.0, 0.25],
+    'z_bound': [-1.2, 2.0, 0.4],
     'd_bound': [-2.0, 0.0, 90],
     'final_dim':
     final_dim,
@@ -43,23 +43,23 @@ backbone_conf = {
     'img_backbone_conf':
     dict(
         type='ResNet',
-        depth=101,
+        depth=34,
         frozen_stages=0,
         out_indices=[0, 1, 2, 3],
         norm_eval=False,
-        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet101'),
+        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet34'),
     ),
     'img_neck_conf':
     dict(
         type='FPN',
         norm_cfg=dict(type='SyncBN', requires_grad=True),
-        in_channels=[256, 512, 1024, 2048],
+        in_channels=[64, 128, 256, 512],
         out_channels=64,
         num_outs=4,
     ),
     'neck_fuse':
     dict(
-        in_channels=[256], out_channels=[64],
+        in_channels=[256], out_channels=[32],
     ),
     'height_net_conf':
     dict(in_channels=512, mid_channels=512),
@@ -77,12 +77,12 @@ ida_aug_conf = {
 }
 
 bev_decoder = dict(
-    type='GHPDCNSACNeck',
-    in_channels=64*8,
-    mid_channels=128,
+    type='HeightAttenNeck',
+    in_channels=8*32,
     out_channels=128,
-    num_layers=2,
-    height_grid_num=8,
+    bev_decoder_num=2,
+    height_atten_layer_num=6,
+    height_size = (8,1,1),
     norm_cfg=dict(type='SyncBN', requires_grad=True),
 )
 
@@ -166,7 +166,7 @@ head_conf = {
 }
 
 
-class Height3DLightningModel(LightningModule):
+class HeightFormerLightningModel(LightningModule):
     MODEL_NAMES = sorted(name for name in models.__dict__
                          if name.islower() and not name.startswith('__')
                          and callable(models.__dict__[name]))
@@ -188,6 +188,7 @@ class Height3DLightningModel(LightningModule):
         self.eval_interval = eval_interval
         self.batch_size_per_device = batch_size_per_device
         self.data_root = data_root
+        # self.basic_lr_per_img = 2e-4 / 64
         self.basic_lr_per_img = 2e-4 / int(gpus * batch_size_per_device)
         self.class_names = class_names
         self.backbone_conf = backbone_conf
@@ -196,11 +197,11 @@ class Height3DLightningModel(LightningModule):
         mmcv.mkdir_or_exist(default_root_dir)
         self.default_root_dir = default_root_dir
         self.evaluator = RoadSideEvaluator(class_names=self.class_names,
-                                           current_classes=["Car", "Pedestrian", "Cyclist"],
+                                           current_classes=["Car", "Bus"],
                                            data_root=data_root,
                                            gt_label_path=gt_label_path,
                                            output_dir=self.default_root_dir)
-        self.model = Height3D(self.backbone_conf, self.head_conf)
+        self.model = HeightFormer(self.backbone_conf, self.head_conf)
         self.mode = 'valid'
         self.img_conf = img_conf
         self.data_use_cbgs = False
@@ -295,7 +296,7 @@ class Height3DLightningModel(LightningModule):
         optimizer = torch.optim.AdamW(self.model.parameters(),
                                       lr=lr,
                                       weight_decay=0.01)
-        scheduler = CosineAnnealingLR(optimizer, T_max=50)
+        scheduler = CosineAnnealingLR(optimizer, T_max=20)
         return [[optimizer], [scheduler]]
 
     def train_dataloader(self):
@@ -303,8 +304,9 @@ class Height3DLightningModel(LightningModule):
             ida_aug_conf=self.ida_aug_conf,
             classes=self.class_names,
             data_root=self.data_root,
-            info_path='./data/dair_12hz_infos_train.pkl',
+            info_path='./data/rope3d/rope3d_12hz_infos_hom_train.pkl',
             is_train=True,
+            is_bda=True,
             use_cbgs=self.data_use_cbgs,
             img_conf=self.img_conf,
             num_sweeps=self.num_sweeps,
@@ -331,7 +333,7 @@ class Height3DLightningModel(LightningModule):
             ida_aug_conf=self.ida_aug_conf,
             classes=self.class_names,
             data_root=self.data_root,
-            info_path='./data/dair_12hz_infos_val.pkl',
+            info_path='./data/rope3d/rope3d_12hz_infos_hom_val.pkl',
             is_train=False,
             img_conf=self.img_conf,
             num_sweeps=self.num_sweeps,
@@ -364,10 +366,13 @@ def main(args: Namespace) -> None:
         pl.seed_everything(args.seed)
     # print(args)
     
-    model = Height3DLightningModel(**vars(args))
-    checkpoint_callback = ModelCheckpoint(dirpath='./outputs/height_3d_ghpdcnsac_r101_864_1536_256x256_102/checkpoints', filename='{epoch}', every_n_epochs=10, save_last=True, save_top_k=-1)
+    model = HeightFormerLightningModel(**vars(args))
+    checkpoint_callback = ModelCheckpoint(dirpath='./outputs/height_former_r34_864_1536_256x256_102/checkpoints', filename='{epoch}', every_n_epochs=2, save_last=True, save_top_k=-1)
     trainer = pl.Trainer.from_argparse_args(args, callbacks=[checkpoint_callback])
     if args.evaluate:
+        # for ckpt_name in os.listdir(args.ckpt_path):
+        #     model_pth = os.path.join(args.ckpt_path, ckpt_name)
+        #     trainer.test(model, ckpt_path=model_pth)
         trainer.test(model, ckpt_path=args.ckpt_path)
     else:
         trainer.fit(model)
@@ -386,18 +391,18 @@ def run_cli():
                                default=0,
                                help='seed for initializing training.')
     parent_parser.add_argument('--ckpt_path', type=str)
-    parser = Height3DLightningModel.add_model_specific_args(parent_parser)
+    parser = HeightFormerLightningModel.add_model_specific_args(parent_parser)
     parser.set_defaults(
         profiler='simple',
         deterministic=False,
-        max_epochs=50,
+        max_epochs=20,
         accelerator='ddp',
         num_sanity_val_steps=0,
         gradient_clip_val=5,
         limit_val_batches=0,
         enable_checkpointing=True,
         precision=32,
-        default_root_dir='./outputs/height_3d_ghpdcnsac_r101_864_1536_256x256_102')
+        default_root_dir='./outputs/height_former_r34_864_1536_256x256_102')
     args = parser.parse_args()
     main(args)
 
