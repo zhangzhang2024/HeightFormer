@@ -8,14 +8,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!--
 [![Paper](https://img.shields.io/badge/Paper-TITS-00629b.svg)](https://ieeexplore.ieee.org/document/11005676)
+-->
+[![Paper](https://img.shields.io/badge/Paper-arXiv-00629b.svg)](https://arxiv.org/pdf/2503.10777)
 
 <p align="center">
-<img src="docs/assets/height3d_fig3.png" width="800" alt="" class="img-responsive">
+<img src="docs/assets/heightformer_fig1.png" width="800" alt="" class="img-responsive">
 </p>
 <p align="center">
-<img src="docs/assets/height3d_fig8.png" width="800" alt="" class="img-responsive">
+<img src="docs/assets/heightformer_fig2.png" width="800" alt="" class="img-responsive">
 </p>
--->
+<p align="center">
+<img src="docs/assets/heightformer_fig3.png" width="800" alt="" class="img-responsive">
+</p>
+
+# Overview
+HeightFormer is an efficient framework learning height prediction in voxel features via transformer. It groups the voxel features into local height sequences, and utilize attention mechanism to obtain height distribution prediction. Subsequently, the local height sequences are reassembled to generate accurate 3D features. The proposed method achieves the state-of-the-art in two large-scale real-world roadside visual perception benchmarks, DAIR-V2X-I and Rope3D. 
 
 # Getting Started
 
