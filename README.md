@@ -10,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Paper](https://img.shields.io/badge/Paper-arXiv-00629b.svg)](https://arxiv.org/pdf/2503.10777)
-![Hello, Visitor](https://komarev.com/ghpvc/?username=zhangzhang2024&repo=HeightFormer&label=Repo%20Views&color=CD5C5C&style=flat)
+![Repo Visitors](https://visitor-badge.laobi.icu/badge?page_id=zhangzhang2024.Height3D&label=Repo%20Visitors&color=CD5C5C)
 
 <p align="center">
 <img src="docs/assets/heightformer_fig1.png" width="800" alt="" class="img-responsive">
