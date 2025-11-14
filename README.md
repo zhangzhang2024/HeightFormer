@@ -10,7 +10,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Paper](https://img.shields.io/badge/Paper-arXiv-00629b.svg)](https://arxiv.org/pdf/2503.10777)
-![Repo Visitors](https://visitor-badge.laobi.icu/badge?page_id=zhangzhang2024.Height3D&label=Repo%20Visitors&color=CD5C5C)
+<a href="https://github.com/zhangzhang2024/HeightFormer" target="_blank">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=zhangzhang2024.heightformer&left_color=gray&right_color=red" alt="visitor badge">
+</a>
+
 
 <p align="center">
 <img src="docs/assets/heightformer_fig1.png" width="800" alt="" class="img-responsive">
