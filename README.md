@@ -49,7 +49,7 @@ This project is not possible without the following codebases.
 * [DAIR-V2X](https://github.com/AIR-THU/DAIR-V2X)
 
 # Citation
-If you use HeightFormer in your research, please cite our work by using the following BibTeX entry:
+If you find our paper and code useful in your research, please consider giving us a star ⭐ and citing our work 📝 :)
 ```
 @article{zhang2025heightformer,
   title={Heightformer: Learning height prediction in voxel features for roadside vision centric 3d object detection via transformer},
